@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hashsigs"
-version = "0.0.1"
+version = "0.0.2"
 description = "WOTS+ hash-based signatures in Python with optional Rust acceleration"
 authors = [
   { name = "Richard T. Carback III", email = "rick.rust.cargo.383d5@passmail.net" }
