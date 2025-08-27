@@ -1,0 +1,19 @@
+[package]
+name = "hashsigs-rs-py"
+version = "0.0.1"
+edition = "2021"
+authors = ["Richard T. Carback III <rick.rust.cargo.383d5@passmail.net>"]
+description = "Python bindings for hashsigs-rs (WOTS+)"
+license = "AGPL-3.0-or-later"
+readme = "../README_PY.md"
+repository = "https://github.com/quipnetwork/hashsigs-rs"
+
+[lib]
+name = "hashsigs_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.25", features = ["extension-module", "abi3-py38"] }
+hashsigs-rs = "0.0.2"
+tiny-keccak = { version = "2", features = ["keccak"] }
+

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+*.egg-info/
+.eggs/
+*.egg
+build/
+dist/
+htmlcov/
+.coverage*
+coverage.xml
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.venv/
+venv/
+.hashsigs/
+.ipynb_checkpoints/
+
+# Rust
+/target/
+python-bindings/target/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Generated native artifacts in package
+hashsigs/_rust*.so
+hashsigs/_rust*.pyd
+hashsigs/_rust*.dylib
+

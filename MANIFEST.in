@@ -1,0 +1,20 @@
+include README.md
+include setup.py
+include setup.cfg
+include pyproject.toml
+
+# Include Python package
+graft hashsigs
+
+# Include tests (vectors)
+prune tests/__pycache__
+recursive-include rust-implementation/tests/test_vectors *.json
+
+# Include Rust bindings and core Rust crate
+graft python-bindings
+graft rust-implementation
+
+# Licenses
+include rust-implementation/COPYING
+include rust-implementation/SECURITY.md
+

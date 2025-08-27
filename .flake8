@@ -1,0 +1,9 @@
+# Copyright (C) 2024 quip.network
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[flake8]
+ignore = E203, E266, E501, W503
+max-line-length = 100
+select = B,C,E,F,W,T4,B9
+exclude = .git,__pycache__,.tox,.eggs,build,dist,venv,.venv
+

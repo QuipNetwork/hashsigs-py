@@ -1,0 +1,40 @@
+# Copyright (C) 2024 quip.network
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+stages:
+  - test
+
+variables:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_WARN_SCRIPT_LOCATION: "0"
+
+.test_template: &test_template
+  stage: test
+  image: python:3.11
+  before_script:
+    - pip install -e .
+    - pip install pytest pytest-cov pycryptodome pysha3 flake8 mypy ruff
+
+pure-python:
+  <<: *test_template
+  variables:
+    HASHSIGS_BUILD_RUST: "0"
+  script:
+    - flake8 .
+    - ruff check .
+    - mypy hashsigs
+    - pytest -q --cov=hashsigs --cov-report=xml:coverage.xml
+
+rust-backend:
+  <<: *test_template
+  image: rust:1.79-bullseye
+  variables:
+    HASHSIGS_BUILD_RUST: "1"
+  before_script:
+    - apt-get update && apt-get install -y python3 python3-pip
+    - python3 -m pip install -e .[rust]
+    - python3 -m pip install pytest pysha3
+  script:
+    - python3 -c "import hashsigs._rust as m; print('rust ext ok', m)"
+    - python3 -m pytest -q --cov=hashsigs --cov-report=xml:coverage.xml
+

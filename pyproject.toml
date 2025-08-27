@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-rust>=1.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hashsigs"
+version = "0.0.1"
+description = "WOTS+ hash-based signatures in Python with optional Rust acceleration"
+authors = [
+  { name = "Richard T. Carback III", email = "rick.rust.cargo.383d5@passmail.net" }
+]
+license = { file = "rust-implementation/COPYING" }
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["cryptography", "wots", "signature", "wots+", "hash-based"]
+classifiers = [
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Rust",
+  "Topic :: Security :: Cryptography",
+]
+
+[project.urls]
+Homepage = "https://github.com/quipnetwork/hashsigs-py"
+Repository = "https://github.com/quipnetwork/hashsigs-py"
+Documentation = "https://docs.rs/hashsigs-rs"
+
+[tool.setuptools]
+packages = ["hashsigs"]
+
+[tool.setuptools.package-data]
+hashsigs = ["py.typed"]
+
+[project.optional-dependencies]
+rust = ["setuptools-rust>=1.9.0"]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "tox>=4",
+  "flake8>=6",
+  "mypy>=1.7",
+  "ruff>=0.4",
+  "pycryptodome",
+]
+
