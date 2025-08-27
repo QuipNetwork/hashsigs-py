@@ -18,7 +18,6 @@
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pyo3::types::IntoPyDict;
 
 use hashsigs_rs as core;
 use tiny_keccak::{Hasher, Keccak};
@@ -53,7 +52,7 @@ impl WotsPlusKeccak256 {
     #[staticmethod]
     fn signature_size() -> usize { core::constants::SIGNATURE_SIZE }
 
-    fn generate_key_pair(&self, private_seed: &[u8]) -> PyResult<(PyObject, PyObject)> {
+    fn generate_key_pair(&self, private_seed: &[u8]) -> PyResult<(Py<PyBytes>, Py<PyBytes>)> {
         if private_seed.len() != core::constants::HASH_LEN {
             return Err(PyValueError::new_err(format!(
                 "private_seed must be {} bytes", core::constants::HASH_LEN
@@ -63,13 +62,13 @@ impl WotsPlusKeccak256 {
         seed.copy_from_slice(private_seed);
         let (pk, sk) = self.inner.generate_key_pair(&seed);
         Python::with_gil(|py| {
-            let pk_bytes: PyObject = PyBytes::new(py, &pk.to_bytes()).to_object(py);
-            let sk_bytes: PyObject = PyBytes::new(py, &sk).to_object(py);
+            let pk_bytes: Py<PyBytes> = PyBytes::new(py, &pk.to_bytes()).into();
+            let sk_bytes: Py<PyBytes> = PyBytes::new(py, &sk).into();
             Ok((pk_bytes, sk_bytes))
         })
     }
 
-    fn get_public_key(&self, private_key: &[u8]) -> PyResult<PyObject> {
+    fn get_public_key(&self, private_key: &[u8]) -> PyResult<Py<PyBytes>> {
         if private_key.len() != core::constants::HASH_LEN {
             return Err(PyValueError::new_err(format!(
                 "private_key must be {} bytes", core::constants::HASH_LEN
@@ -78,10 +77,10 @@ impl WotsPlusKeccak256 {
         let mut sk = [0u8; core::constants::HASH_LEN];
         sk.copy_from_slice(private_key);
         let pk = self.inner.get_public_key(&sk);
-        Python::with_gil(|py| Ok(PyBytes::new(py, &pk.to_bytes()).to_object(py)))
+        Python::with_gil(|py| Ok(PyBytes::new(py, &pk.to_bytes()).into()))
     }
 
-    fn sign(&self, private_key: &[u8], message: &[u8]) -> PyResult<PyObject> {
+    fn sign(&self, private_key: &[u8], message: &[u8]) -> PyResult<Py<PyBytes>> {
         if private_key.len() != core::constants::HASH_LEN {
             return Err(PyValueError::new_err(format!(
                 "private_key must be {} bytes", core::constants::HASH_LEN
@@ -100,7 +99,7 @@ impl WotsPlusKeccak256 {
             let start = i * core::constants::HASH_LEN;
             sig[start..start + core::constants::HASH_LEN].copy_from_slice(seg);
         }
-        Python::with_gil(|py| Ok(PyBytes::new(py, &sig).to_object(py)))
+        Python::with_gil(|py| Ok(PyBytes::new(py, &sig).into()))
     }
 
     fn verify(&self, public_key: &[u8], message: &[u8], signature: &[u8]) -> PyResult<bool> {
