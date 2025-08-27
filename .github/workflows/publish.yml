@@ -65,7 +65,7 @@ jobs:
 
       - name: Test wheel
         run: |
-          pip install pycryptodome pytest
+          pip install pycryptodome pytest pytest-cov
           pip install dist/*.whl
           python -c "import hashsigs; print('Package imported successfully')"
           pytest tests/test_pure_python_basic.py -v
