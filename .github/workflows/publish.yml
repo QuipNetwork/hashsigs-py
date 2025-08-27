@@ -20,10 +20,31 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    
+        include:
+          - os: ubuntu-latest
+            python: "3.11"
+            build_rust: "0"
+            wheel_type: "pure-python"
+          - os: windows-latest
+            python: "3.11"
+            build_rust: "1"
+            wheel_type: "rust-accelerated"
+          - os: macos-latest
+            python: "3.11"
+            build_rust: "1"
+            wheel_type: "rust-accelerated"
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Set up Rust (if building Rust extension)
+        if: matrix.build_rust == '1'
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Clean any existing build artifacts
         shell: bash
@@ -32,28 +53,27 @@ jobs:
           find . -name "*.pyc" -delete 2>/dev/null || true
           find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.5
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools-rust
+
+      - name: Build wheel (${{ matrix.wheel_type }})
         env:
-          # Build for Python 3.8-3.13 on all platforms
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*
-          # Skip 32-bit builds and musl builds for now
-          CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux*"
-          # Install Rust for macOS and Windows only (Linux gets pure Python wheels)
-          CIBW_BEFORE_ALL_MACOS: "rustup target add aarch64-apple-darwin x86_64-apple-darwin"
-          CIBW_BEFORE_ALL_WINDOWS: "rustup target add x86_64-pc-windows-msvc"
-          # Build Rust extension on macOS and Windows, pure Python on Linux
-          CIBW_ENVIRONMENT_MACOS: "HASHSIGS_BUILD_RUST=1"
-          CIBW_ENVIRONMENT_WINDOWS: "HASHSIGS_BUILD_RUST=1"
-          CIBW_ENVIRONMENT_LINUX: "HASHSIGS_BUILD_RUST=0"
-          # Test that the wheel works
-          CIBW_TEST_REQUIRES: pytest pycryptodome
-          CIBW_TEST_COMMAND: "python -c 'import hashsigs; print(\"Package imported successfully\")' && pytest {project}/tests/test_basic.py -v -m 'not requires_rust'"
-      
+          HASHSIGS_BUILD_RUST: ${{ matrix.build_rust }}
+        run: python -m build --wheel --outdir dist/
+
+      - name: Test wheel
+        run: |
+          pip install pycryptodome pytest
+          pip install dist/*.whl
+          python -c "import hashsigs; print('Package imported successfully')"
+          pytest tests/test_pure_python_basic.py -v
+
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./wheelhouse/*.whl
+          name: wheel-${{ matrix.os }}-${{ matrix.wheel_type }}
+          path: dist/*.whl
 
   build-sdist:
     name: Build source distribution
@@ -82,7 +102,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: cibw-*
+          pattern: wheel-*
           path: dist
           merge-multiple: true
       

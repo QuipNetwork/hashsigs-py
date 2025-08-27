@@ -18,14 +18,19 @@
 from setuptools import setup
 import os
 
-# Build Rust extension optionally. If building fails or setuptools-rust is missing,
-# installation will still succeed with pure Python.
-# Users can set HASHSIGS_BUILD_RUST=0 to skip building the extension.
+# Smart Rust extension building:
+# 1. If HASHSIGS_BUILD_RUST=0, skip Rust entirely (pure Python)
+# 2. If HASHSIGS_BUILD_RUST=1, force Rust build (fail if it doesn't work)
+# 3. If unset (default), try Rust first, fall back to pure Python if it fails
 
-build_rust = os.environ.get("HASHSIGS_BUILD_RUST", "1") != "0"
+build_rust_env = os.environ.get("HASHSIGS_BUILD_RUST", "auto")
 
 rust_extensions = []
-if build_rust:
+if build_rust_env == "0":
+    # Explicitly disabled
+    print("hashsigs: Rust extension disabled by HASHSIGS_BUILD_RUST=0")
+elif build_rust_env == "1":
+    # Explicitly enabled - fail if it doesn't work
     try:
         from setuptools_rust import RustExtension, Binding
         rust_extensions = [
@@ -34,10 +39,31 @@ if build_rust:
                 path="python-bindings/Cargo.toml",
                 binding=Binding.PyO3,
                 debug=False,
-                optional=True,
+                optional=False,  # Fail if Rust build fails
             )
         ]
-    except Exception:
+        print("hashsigs: Building with Rust extension (forced)")
+    except ImportError as e:
+        raise RuntimeError(f"hashsigs: HASHSIGS_BUILD_RUST=1 but setuptools-rust not available: {e}")
+else:
+    # Auto mode - try Rust, fall back to pure Python
+    try:
+        from setuptools_rust import RustExtension, Binding
+        import subprocess
+        # Quick check if Rust toolchain is available
+        subprocess.run(["rustc", "--version"], check=True, capture_output=True)
+        rust_extensions = [
+            RustExtension(
+                "hashsigs._rust",
+                path="python-bindings/Cargo.toml",
+                binding=Binding.PyO3,
+                debug=False,
+                optional=True,  # Fall back to pure Python if build fails
+            )
+        ]
+        print("hashsigs: Attempting to build with Rust extension (auto-detected)")
+    except (ImportError, subprocess.CalledProcessError, FileNotFoundError):
+        print("hashsigs: Rust toolchain not available, building pure Python version")
         rust_extensions = []
 
 setup(
