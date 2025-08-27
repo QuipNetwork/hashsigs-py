@@ -39,17 +39,16 @@ jobs:
           CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*
           # Skip 32-bit builds and musl builds for now
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux*"
-          # Install Rust for building the extension
-          CIBW_BEFORE_ALL_LINUX: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source ~/.cargo/env"
+          # Install Rust for macOS and Windows only (Linux gets pure Python wheels)
           CIBW_BEFORE_ALL_MACOS: "rustup target add aarch64-apple-darwin x86_64-apple-darwin"
           CIBW_BEFORE_ALL_WINDOWS: "rustup target add x86_64-pc-windows-msvc"
-          # Set environment variable to ensure Rust extension builds
-          CIBW_ENVIRONMENT: "HASHSIGS_BUILD_RUST=1"
-          # Handle auditwheel repair for Rust extensions - use --strip to remove debug info
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --strip -w {dest_dir} {wheel}"
+          # Build Rust extension on macOS and Windows, pure Python on Linux
+          CIBW_ENVIRONMENT_MACOS: "HASHSIGS_BUILD_RUST=1"
+          CIBW_ENVIRONMENT_WINDOWS: "HASHSIGS_BUILD_RUST=1"
+          CIBW_ENVIRONMENT_LINUX: "HASHSIGS_BUILD_RUST=0"
           # Test that the wheel works
           CIBW_TEST_REQUIRES: pytest pycryptodome
-          CIBW_TEST_COMMAND: "python -c 'import hashsigs; print(\"Package imported successfully\")' && pytest {project}/tests/test_basic.py -v"
+          CIBW_TEST_COMMAND: "python -c 'import hashsigs; print(\"Package imported successfully\")' && pytest {project}/tests/test_basic.py -v -m 'not requires_rust'"
       
       - uses: actions/upload-artifact@v4
         with:
