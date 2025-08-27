@@ -2,9 +2,51 @@
 
 Python package for WOTS+ with optional Rust acceleration from hashsigs-rs.
 
-## Quickstart (recommended)
+## Installation
 
-Create a project-local virtual environment named `.hashsigs` and run all tests:
+```bash
+pip install hashsigs
+```
+
+For best performance, ensure you have Rust installed (the package will automatically build the Rust extension if available):
+
+```bash
+# Install Rust toolchain (optional, for better performance)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# Then install hashsigs
+pip install hashsigs
+```
+
+## Quick Usage
+
+```python
+import hashsigs
+
+# Create a WOTS+ instance
+wots = hashsigs.WOTSPlus()
+
+# Generate a key pair
+private_key, public_key = wots.generate_key_pair()
+
+# Sign a message
+message = b"Hello, world!"
+signature = wots.sign(private_key, message)
+
+# Verify the signature
+is_valid = wots.verify(public_key, message, signature)
+print(f"Signature valid: {is_valid}")  # True
+
+# Check if Rust acceleration is available
+try:
+    import hashsigs._rust
+    print("Using Rust acceleration")
+except ImportError:
+    print("Using pure Python implementation")
+```
+
+## Development Setup
+
+For contributors and advanced users who want to build from source:
 
 ```bash
 # from the repo root
