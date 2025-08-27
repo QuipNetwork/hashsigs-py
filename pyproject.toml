@@ -9,7 +9,7 @@ description = "WOTS+ hash-based signatures in Python with optional Rust accelera
 authors = [
   { name = "Richard T. Carback III", email = "rick.rust.cargo.383d5@passmail.net" }
 ]
-license = "AGPL-3.0-or-later"
+license = {text = "AGPL-3.0-or-later"}
 license-files = ["COPYING"]
 readme = "README.md"
 requires-python = ">=3.8"
