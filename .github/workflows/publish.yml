@@ -38,6 +38,8 @@ jobs:
           CIBW_BEFORE_ALL_WINDOWS: "rustup target add x86_64-pc-windows-msvc"
           # Set environment variable to ensure Rust extension builds
           CIBW_ENVIRONMENT: "HASHSIGS_BUILD_RUST=1"
+          # Handle auditwheel repair for Rust extensions - use --strip to remove debug info
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --strip -w {dest_dir} {wheel}"
           # Test that the wheel works
           CIBW_TEST_REQUIRES: pytest pycryptodome
           CIBW_TEST_COMMAND: "python -c 'import hashsigs; print(\"Package imported successfully\")' && pytest {project}/tests/test_basic.py -v"
