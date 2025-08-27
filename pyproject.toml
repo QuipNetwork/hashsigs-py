@@ -9,12 +9,12 @@ description = "WOTS+ hash-based signatures in Python with optional Rust accelera
 authors = [
   { name = "Richard T. Carback III", email = "rick.rust.cargo.383d5@passmail.net" }
 ]
-license = { file = "rust-implementation/COPYING" }
+license = "AGPL-3.0-or-later"
+license-files = ["COPYING"]
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["cryptography", "wots", "signature", "wots+", "hash-based"]
 classifiers = [
-  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.8",
@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Rust",
   "Topic :: Security :: Cryptography",
 ]
