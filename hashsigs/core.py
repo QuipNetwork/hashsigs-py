@@ -171,7 +171,7 @@ class WOTSPlus:
         if len(private_seed) != self.n:
             raise ValueError(f"private_seed must be {self.n} bytes")
         if self._rust_backend is not None:
-            pk_bytes, sk_bytes = self._rust_backend.generate_key_pair(private_seed)  # type: ignore[assignment]
+            pk_bytes, sk_bytes = self._rust_backend.generate_key_pair(private_seed)
             pk = PublicKey.from_bytes(pk_bytes)
             if pk is None:
                 raise ValueError("Invalid PublicKey from rust backend")
@@ -184,7 +184,7 @@ class WOTSPlus:
         if len(private_key) != self.n:
             raise ValueError(f"private_key must be {self.n} bytes")
         if self._rust_backend is not None:
-            pk_bytes = self._rust_backend.get_public_key(private_key)  # type: ignore[assignment]
+            pk_bytes = self._rust_backend.get_public_key(private_key)
             pk = PublicKey.from_bytes(pk_bytes)
             if pk is None:
                 raise ValueError("Invalid public key from rust backend")
@@ -211,7 +211,7 @@ class WOTSPlus:
         if len(message) != self.m:
             raise ValueError(f"message must be {self.m} bytes")
         if self._rust_backend is not None:
-            return self._rust_backend.sign(private_key, message)  # type: ignore[call-arg]
+            return self._rust_backend.sign(private_key, message)
         public_seed = self._prf(private_key, 0)
         rand = self._generate_randomization_elements(public_seed)
         function_key = rand[0]
@@ -229,7 +229,7 @@ class WOTSPlus:
         if len(message) != self.m or len(signature) != self.len * self.n:
             return False
         if self._rust_backend is not None:
-            return self._rust_backend.verify(public_key.to_bytes(), message, signature)  # type: ignore[call-arg]
+            return self._rust_backend.verify(public_key.to_bytes(), message, signature)
         rand = self._generate_randomization_elements(public_key.public_seed)
         chain_idxs = self._compute_message_hash_chain_indexes(message)
         segments = bytearray(self.len * self.n)
@@ -246,7 +246,7 @@ class WOTSPlus:
 def _python_keccak256() -> Callable[[bytes], bytes]:
     # Try pycryptodome
     try:
-        from Crypto.Hash import keccak as _k  # type: ignore
+        from Crypto.Hash import keccak as _k
 
         def _h(b: bytes) -> bytes:
             h = _k.new(digest_bits=256)
