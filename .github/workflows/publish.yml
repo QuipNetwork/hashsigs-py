@@ -26,9 +26,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Clean any existing build artifacts
+        shell: bash
         run: |
-          rm -rf build/ dist/ *.egg-info/ hashsigs/_rust*.so hashsigs/__pycache__/
-          find . -name "*.pyc" -delete
+          rm -rf build/ dist/ *.egg-info/ hashsigs/_rust*.so hashsigs/_rust*.pyd hashsigs/__pycache__/
+          find . -name "*.pyc" -delete 2>/dev/null || true
           find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
       - name: Build wheels
