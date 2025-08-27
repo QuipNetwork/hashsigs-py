@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,15 +22,16 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pycryptodome
+          pip install -e .[dev]
+          pip install pycryptodome
       - name: Run lint/type/coverage
+        env:
+          HASHSIGS_BUILD_RUST: "0"
         run: |
-          pip install flake8 mypy ruff pytest-cov
           flake8 .
           ruff check .
           mypy hashsigs
-          pytest -q --cov=hashsigs --cov-report=xml:coverage.xml
+          pytest -q --cov=hashsigs --cov-report=xml:coverage.xml -m "not requires_rust"
       - name: Upload coverage to GitHub (Artifact)
         uses: actions/upload-artifact@v4
         with:
@@ -51,8 +52,8 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[rust]
-          pip install pytest pycryptodome
+          pip install -v -e .[rust,dev]
+          pip install pycryptodome
       - name: Build rust extension
         env:
           HASHSIGS_BUILD_RUST: "1"
