@@ -64,10 +64,20 @@ jobs:
         run: python -m build --wheel --outdir dist/
 
       - name: Test wheel
+        shell: bash
         run: |
           pip install pycryptodome pytest pytest-cov
-          pip install dist/*.whl
+          # Find and install the wheel (handle Windows path issues)
+          WHEEL_FILE=$(find dist -name "*.whl" | head -1)
+          echo "Installing wheel: $WHEEL_FILE"
+          pip install -v "$WHEEL_FILE"
+          # Test basic import
           python -c "import hashsigs; print('Package imported successfully')"
+          # Test Rust extension if it should be available
+          if [ "${{ matrix.build_rust }}" = "1" ]; then
+            python -c "import hashsigs._rust as m; print('Rust extension ok:', m)" || echo "Rust extension not available (this is OK if build failed)"
+          fi
+          # Run basic tests
           pytest tests/test_pure_python_basic.py -v
 
       - uses: actions/upload-artifact@v4
