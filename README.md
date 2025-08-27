@@ -11,11 +11,20 @@ Create a project-local virtual environment named `.hashsigs` and run all tests:
 python3 -m venv .hashsigs
 source .hashsigs/bin/activate
 python -m pip install -U pip pytest pytest-cov
-# Install dev deps and try to build rust extension
-pip install -e '.[rust,dev]'
-# Install keccak provider (required for vectors)
+
+# Ensure Rust toolchain (required to build the optional extension)
+# macOS: also ensure Xcode CLT: xcode-select --install
+rustup --version || brew install rust
+cargo --version
+
+# Install dev deps and try to build rust extension (quote extras in zsh)
+pip install -v -e '.[rust,dev]'
+# Install keccak provider (required for vectors when falling back to Python)
 pip install pycryptodome
 # or: pip install pysha3
+
+# Quick check the extension is present (optional)
+python -c "import hashsigs._rust as m; print('rust ext ok:', m)"
 
 # Lint + type + tests with coverage; this is the full suite
 pytest -q --cov=hashsigs --cov-report=term-missing
