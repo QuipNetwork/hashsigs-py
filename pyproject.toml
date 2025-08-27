@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=77.0.0", "wheel", "setuptools-rust>=1.9.0"]
+requires = ["setuptools>=68", "wheel", "setuptools-rust>=1.9.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,8 +9,7 @@ description = "WOTS+ hash-based signatures in Python with optional Rust accelera
 authors = [
   { name = "Richard T. Carback III", email = "rick.rust.cargo.383d5@passmail.net" }
 ]
-license = "AGPL-3.0-or-later"
-license-files = ["COPYING"]
+license = {file = "COPYING"}
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["cryptography", "wots", "signature", "wots+", "hash-based"]
