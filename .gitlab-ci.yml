@@ -1,6 +1,11 @@
 # Copyright (C) 2024 quip.network
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+include:
+  - project: quip.network/ci-templates
+    ref: v1.0.0
+    file: templates/dependency-gate.yml
+
 stages:
   - test
 
