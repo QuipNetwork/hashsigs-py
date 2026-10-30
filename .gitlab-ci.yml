@@ -35,7 +35,7 @@ pure-python:
 
 rust-backend:
   <<: *test_template
-  image: rust:1.82-bullseye
+  image: rust:1.82-bookworm
   variables:
     HASHSIGS_BUILD_RUST: "1"
   before_script:
