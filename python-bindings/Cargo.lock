@@ -22,7 +22,7 @@ checksum = "8930afc49ab39cb46135bbf81faa06f353cebf1cd83b6d63540f84421a1552f1"
 
 [[package]]
 name = "hashsigs-rs-py"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "hashsigs-rs",
  "pyo3",
