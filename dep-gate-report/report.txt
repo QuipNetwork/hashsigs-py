@@ -1,1 +1,0 @@
-Dependency gate passed: 21 dependencies checked, none prerelease, none newer than 7 days.
